@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAD Calculator</title>
+    <style>
+        /* Styles remain the same as the previous version */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #0056b3;
+        }
+        .subtitle {
+            font-size: 1.25rem;
+            margin-top: 1rem;
+            color: #343a40;
+        }
+        p {
+            line-height: 1.6;
+            margin: 1rem 0;
+        }
+        .formula {
+            background-color: #e9ecef;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        .formula div {
+            margin: 0.5rem 0;
+        }
+        hr {
+            border: 0;
+            height: 1px;
+            background-color: #dee2e6;
+            margin: 2rem 0;
+        }
+        .calculator {
+            margin-top: 2rem;
+        }
+        .calculator p {
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 1rem;
+        }
+        .input-field {
+            padding: 0.5rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-container label {
+            margin-left: 0.5rem;
+        }
+        .results {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .results div {
+            margin: 1rem 0;
+        }
+        .results .total {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .reset-button {
+            background-color: #808080;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .reset-button:hover {
+            background-color: #A9A9A9;
+        }
+        .border {
+            border-top: 1px solid #333;
+            width: 100%;
+            margin: 10px auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            text-align: center;
+        }
+        .text-gray-400 { color: #808080; }
+        .text-red-500 { color: #8B0000; }
+        .text-green-600 { color: #008000; }
+        .text-yellow-500 { color: #8B8000 ; }
+        .text-blue-400 { color: #00008B; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <lad-calculator></lad-calculator>
+        </div>
+    </div>
+    <template id="lad-calculator-template">
+        <div>
+            <div class="title">LAD Calculator</div>
+            <p>LAD stands for <strong> Liquidated Ascertained Damages</strong>. It is a pre-agreed amount specified in a contract that one party will pay to the other if there is a breach of certain terms, such as delays in project completion. LAD is commonly used in construction contracts and real estate transactions to compensate the buyer for any delays or failures to meet specified deadlines. The calculation of LAD typically involves factors such as the duration of the delay and the agreed daily penalty rate.
+            </p>
+            <p>In the context of the LAD calculator provided in the code, it seems to relate to calculating the compensation due to a homebuyer for delays in the delivery of their property and common facilities. The calculator considers various factors like the signed SPA date, purchase amount, and delays affected by exemptions (such as the MCO period).</p>
+            <br />
+            <p>The calculation of LAD payment according to the calculation specified in <b>Clause 26 (2) Sale and Purchase Agreement (SPA) and Section 35 of the COVID-19 Act</b> is as follows:</p>
+            <br />
+            <div class="formula">
+                <div>10% x house price x [number of delayed days - exemption period]</div>
+                <div class="border" />
+                <div>365</div>
+            </div>
+        </div>
+            <hr />
+        <div>
+            <p>According to Clause 28(2), owners may claim LAD for common facilities, below is the calculation formula:</p>
+            <br />
+            <div class="formula">
+                <div>20% x house price x 10% x [number of delayed days - exemption period*]</div>
+                <div class="border" />
+                <div>365</div>
+            </div>
+        </div>
+                <sub>* It is not clear that Covid-19 Act exemption period is applicable to common facilities</sub>
+
+        <hr />
+
+        <div>
+            <div class="calculator">
+                <p>You can utilize the calculator below to calculate the estimated LAD amount.</p>
+                <div class="grid">
+                    <label for="spa-date">SPA Signed Date</label>
+                    <input
+                        class="input-field"
+                        id="spa-date"
+                        type="date"
+                        v-model="spaDate"
+                    />
+                    <label for="purchase-amount">Purchase Price</label>
+                    <input
+                        class="input-field"
+                        id="purchase-amount"
+                        type="text"
+                        pattern="\\d*"
+                        inputmode="numeric"
+                        v-model.number="purchaseAmount"
+                    />
+                    <label for="vp-date">VP Date</label>
+                    <input
+                        class="input-field"
+                        id="vp-date"
+                        type="date"
+                        v-model="estimatedVP"
+                    />
+                    <label for="ccc-date">CCC Date</label>
+                    <input
+                        class="input-field"
+                        id="ccc-date"
+                        type="date"
+                        v-model="defaultCfCCCDate"
+                    />
+                    <span></span>
+                    <span>**Common facilities cut-off after CCC obtained day.</span>
+                   
+                </div>
+                <hr>
+                <table>
+                    <thead>
+                        <tr>
+                            <th colspan="4" class="font-bold text-center">Estimated LAD Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-right">Days of Delay</td>
+                            <td class="text-yellow-500">{{ delayInDays }} Days</td>
+                            <td colspan="2">
+                                <div class="checkbox-container">
+                                    <input
+                                    id="mco-offset-delay"
+                                    class="mr-2"
+                                    type="checkbox"
+                                    v-model="showMCOOffset"
+                                />
+                                <label for="mco-offset-delay">
+                                    Offset MCO Period
+                                </label>
+                                </div>
+                            </td>
+                        </tr>
+                         
+                        <tr>
+                            <td class="text-right">Unit</td>
+                            <td class="text-green-600">MYR {{ unitLADAmount.toFixed(2) }}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td class="text-right">Common Facilities **</td>
+                            <td class="text-green-600">MYR {{ cfLADAmount.toFixed(2) }}</td>
+                            <td colspan="2">
+                                <div class="checkbox-container">
+                                    <input
+                                        id="mco-offset-lad"
+                                        class="mr-2"
+                                        type="checkbox"
+                                        v-model="mcoOffsetLAD"
+                                    />
+                                    <label for="mco-offset-lad">
+                                        Offset MCO Period
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-right font-bold">Total</td>
+                            <td class="total text-blue-400"><strong>MYR {{ totalLADAmount.toFixed(2) }}</strong></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div>
+                    <div v-if="showMessage" class="text-red-500 col-span-4 text-center">
+                        You are NOT entitled to LAD.
+                    </div>
+
+                    <hr>
+            
+                    <div class="col-span-4 text-center">
+                        Dates and purchase amount are using default value, <button class="reset-button" @click="clearCachedData">click here</button> to reset and clear.
+                    </div>
+                </div>
+            
+            </div>
+        </div>
+    </template>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="lad-calculator.js"></script>
+</body>
+</html>
